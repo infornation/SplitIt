@@ -40,9 +40,10 @@ struct ContentView: View {
         NavigationView{
             Form{
                 Section {
-                    TextField("Amount", value: $checkAmount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                    TextField("Amount", value: $checkAmount, format: .localCurrency)
                         .keyboardType(.decimalPad)
                         .focused($amountIsFocused)
+                        
                     Picker("Number of people", selection: $numberOfPeople){
                         ForEach(0..<10){
                             if $0 == 0 {
@@ -89,11 +90,11 @@ struct ContentView: View {
                 }
                 Section("Total amount"){
                     Text(totalForEveryone, format:
-                            .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                            .localCurrency)
                     .foregroundColor(tipPercentage == 0 ? .red : .black)
                 }
                 Section ("Amount per person"){
-                    Text(totalPerPerson, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                    Text(totalPerPerson, format: .localCurrency)
                 }
                 
                 Button("Save expense") {

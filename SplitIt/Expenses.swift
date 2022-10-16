@@ -16,6 +16,14 @@ class Expenses: ObservableObject {
         }
     }
     
+    var mine: [ExpenseItem] {
+        items.filter { $0.iPaid == true }
+    }
+    
+    var friends: [ExpenseItem] {
+        items.filter { $0.iPaid == false }
+    }
+    
     init() {
         if let savedItems = UserDefaults.standard.data(forKey: "Items") {
             if let decodedItems = try? JSONDecoder().decode([ExpenseItem].self, from: savedItems) {

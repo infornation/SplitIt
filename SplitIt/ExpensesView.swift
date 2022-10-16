@@ -9,37 +9,48 @@ import SwiftUI
 
 struct ExpensesView: View {
     @ObservedObject var expenses: Expenses
+    @State private var iPaid = true
     
     var body: some View {
         NavigationStack{
-            List{
-                ForEach(expenses.items) { item in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(item.name)
-                                .font(.headline)
-                            Text(item.type)
-                        }
-                        
-                        Spacer()
-                        HStack {
-                            Image(systemName: "person.fill")
-                            Text("\(item.numberOfPeople)")
-                        }
-                       Divider()
-
-                        Text(item.splittedAmount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
-
-
-                    }
-                    
-                }.onDelete(perform: removeExpense)
-            }.navigationTitle("Previous expenses")
+            Picker(selection: $iPaid, label: Text("Who paid the epxense?")) {
+                Text("I paid")
+                    .tag(true)
+                    .padding()
+                Text("Friend paid")
+                    .tag(false)
+                    .padding()
+            }.pickerStyle(.segmented)
+            
+            if iPaid {
+                ExpenseGroupView(expenses: expenses.mine, deleteItems: removeMineExpense)
+            } else {
+                ExpenseGroupView(expenses: expenses.friends, deleteItems: removeFriendsExpense)
+            }
+            
         }
     }
     
-    func removeExpense(at offsets: IndexSet) {
-        expenses.items.remove(atOffsets: offsets)
+    func removeExpense(at offsets: IndexSet, in inputArray: [ExpenseItem]) {
+        var objectsToDelete = IndexSet()
+        
+        for offset in offsets {
+            let item = inputArray[offset]
+            
+            if let index = expenses.items.firstIndex(of: item) {
+                objectsToDelete.insert(index)
+            }
+        }
+        
+        expenses.items.remove(atOffsets: objectsToDelete)
+    }
+    
+    func removeMineExpense(at offsets: IndexSet) {
+        removeExpense(at: offsets, in: expenses.mine)
+    }
+    
+    func removeFriendsExpense(at offsets: IndexSet) {
+        removeExpense(at: offsets, in: expenses.friends)
     }
 }
 

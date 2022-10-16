@@ -10,29 +10,24 @@ import SwiftUI
 struct ExpenseDetailView: View {
     @ObservedObject var expenses: Expenses
     @State private var name = ""
-    @State private var type = "Personal"
+    @State private var didIPay = true
     @Binding var checkAmount: Double
     @Binding var expenseDetailOpened: Bool
     @Binding var numberOfPeople: Int
     @Binding var totalPerPersonAmount: Double
-    let types = ["Business", "Personal"]
+    let types = ["I paid", "I didn't pay"]
     
     var body: some View {
         Form{
             TextField("Name your expense...", text: $name)
             
-            Picker("Type of expense", selection: $type) {
-                ForEach(types, id: \.self) {
-                    Text($0)
-                }
-                
-            }
+            Toggle("I paid", isOn: $didIPay)
         
-            TextField("Amount", value: $checkAmount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+            TextField("Amount", value: $checkAmount, format: .localCurrency)
                 .keyboardType(.decimalPad)
             
             Button("Save expense") {
-                let expense = ExpenseItem(name: name, type: type, splittedAmount: totalPerPersonAmount, numberOfPeople: numberOfPeople)
+                let expense = ExpenseItem(name: name, iPaid: didIPay, splittedAmount: totalPerPersonAmount, numberOfPeople: numberOfPeople)
                 expenses.items.append(expense)
                 expenseDetailOpened = false
             }
